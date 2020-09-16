@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title> Pie Chart</title>
+  
+  <style>
+  #chart2 {
+    position: relative; /* To allow the tooltip to be positioned relative to the div */
+    display: block;
+    width: 600px;
+    margin: 0 auto;
+}
+
+.tooltip {
+    position: absolute;
+    width: 80px;
+    padding: 10px;
+    background: #eee;
+    color: #333;
+    display: none;
+    font-size: 12px;
+    text-align: center;
+    box-shadow: 0 0 5px #999;
+    z-index: 10;
+}
+
+rect {
+    cursor: pointer;
+    stroke-width: 2;
+}
+
+rect.disabled {
+    fill: transparent !important;
+}
+
+legend {
+    font-size: 18px;
+}
+
+rect {
+    stroke-width: 2;
+}
+  </style>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+
+    <div id="chart2">
+    </div>
+	<div>The above displayed is the donut chart for cereals data. Here it shows the average Protein that each manufacturer food products contains. <b><i>It is interactive please hover on the chart as well as click on the button to show only specific manufacturers. </i></b></div>
+</body>
+	<script>
+var margin = {top: 60, right: 0, bottom: 0, left: 0};
+
+var width = 500-margin.left-margin.right;
+var height = 500-margin.top - margin.bottom;
+var fullWidth = width + margin.left+margin.right;
+var fullHeight = height+margin.top+margin.bottom;
+var radius = Math.min(width, height) / 2;
+
+var color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+var svg = d3.select("#chart2").append("svg")
+    .attr("width", fullWidth)
+    .attr("height", fullHeight);
+
+var g = svg.append("g")
+    .attr("transform","translate(" + (fullWidth / 2) + "," + (fullHeight / 2) +")")
+    .attr("class","chartGroup");
+
+var donutWidth = ( width / 4);
+
+var arc = d3.arc()
+    .innerRadius(donutWidth)
+    .outerRadius(radius);
+
+var pie = d3.pie()
+    .value(function(d) { return d.Protein})
+    .sort(null);
+
+var tooltip = d3.select('#chart2')
+    .append('div')
+    .attr('class','tooltip')
+
+tooltip.append('div')
+    .attr('class','Manufacturer');
+tooltip.append('div')
+    .attr('class', 'Protein');
+tooltip.append('div')
+    .attr('class','percent');
+
+
+
+ d3.csv('data/cereals.csv', function(error, dataset) {
+          dataset.forEach(function(d) {
+            d.Protein = +d.Protein;
+            d.enabled = true;
+          });               
+     
+var path = g.selectAll('path')
+    .data(pie(dataset))
+    .enter()
+    .append('path')
+        .attr('d',arc)
+        .attr('fill', function(d,i){
+            return color(d.data.Manufacturer);
+        })
+    .each(function(d){this._current = d;});
+
+path.on('mousemove', function(d){
+      var xposSub = document.getElementById("chart2").getBoundingClientRect().left; 
+      var xpos = d3.event.x - xposSub + 20  
+      var ypos = d3.event.y    
+      tooltip.style("left" ,xpos + "px")
+      tooltip.style("top", ypos + "px")  
+    var total = d3.sum(dataset.map(function(d){
+      return (d.enabled) ? d.Protein : 0;
+    }));
+  var percent = Math.round(10000 * d.data.Protein / total) / 100;
+  tooltip.select('.Manufacturer').html(d.data.Manufacturer);
+  tooltip.select('.Protein').html(d.data.Protein);
+  tooltip.select('.percent').html(percent + '%');
+  tooltip.style('display', 'block');
+});
+   
+     
+     
+path.on('mouseout', function(d){
+    tooltip.style('display','none');
+
+});
+   
+var legendRectSize = 18;
+var legendSpacing = 10; 
+
+var legend = g.selectAll('.legend')
+    .data(color.domain()) 
+    .enter()
+        .append('g')
+        .attr('class','legend')
+        .attr('transform', function(d,i){
+            var height = legendRectSize + legendSpacing;
+            var offset = height * color.domain().length / 2;
+            var horz = -2 * legendRectSize;
+            var vert = i * height-offset;
+            return 'translate(' + horz + ',' + vert + ')';
+        });
+
+    legend.append('rect')
+        .attr('width',legendRectSize)
+        .attr('height',legendRectSize)
+        .style('fill',color)
+        .style('stroke',color)
+
+        .on('click', function(Manufacturer){
+        var rect = d3.select(this);
+  var enabled = true;
+  var totalEnabled = d3.sum(dataset.map(function(d) {
+    return (d.enabled) ? 1 : 0;
+  }));
+
+  if (rect.attr('class') === 'disabled') {
+    rect.attr('class', '');
+  } else {
+    if (totalEnabled < 2) return;
+    rect.attr('class', 'disabled');
+    enabled = false;
+  }
+
+  pie.value(function(d) {
+    if (d.Manufacturer === Manufacturer) d.enabled = enabled;
+    return (d.enabled) ? d.Protein : 0;
+  });
+
+  path = path.data(pie(dataset));
+
+  path.transition()
+    .duration(750)
+    .attrTween('d', function(d) {
+      var interpolate = d3.interpolate(this._current, d);
+      this._current = interpolate(0);
+      return function(t) {
+        return arc(interpolate(t));
+      };
+    });
+    });
+
+
+legend.append('text')
+  .attr('x', legendRectSize + legendSpacing)
+  .attr('y', legendRectSize - legendSpacing)
+  .attr('style','font-size: 18')
+  .attr('alignment-baseline','middle')
+  .text(function(d) { return d; });
+
+ });
+ 
+ svg.append("text")
+	.attr('x', 0)
+	.attr('y', 15)
+	.attr("font-size", "20px")
+	.text("Average Protein of each Manufacturer Interactive Donut chart")
+	
+	
+	</script>
+</html>

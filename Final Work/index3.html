@@ -1,0 +1,177 @@
+<html>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"> </link><style>
+
+#list{
+ padding : 10px 25px;
+ border-radius:5px;
+}
+
+#headerTable{
+   border:1px solid grey;
+   background-color:#efefef;
+     font-family: Helvetica, Sans-Serif; 
+   }
+ 
+ 
+ body{
+      padding:0px;
+	  margin:0px;
+	  font-family: Helvetica, Sans-Serif;  
+ }
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 7px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: inset 0 0 5px grey; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: grey; 
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: grey; 
+}
+
+</style>
+<body onload="hideAllDivs()">
+	<script>
+	
+	 function GetSelectedTextValue(chartName) {        
+        var selectedValue = chartName.value;
+        
+		if(selectedValue == "scatter1"){
+		    hideAllDivs();
+            showLoader();			
+			setTimeout(() => { hideLoader(); document.getElementById("scatter1div").style.display = "block";  }, 1000);
+		}
+		else if(selectedValue == "scatter2"){
+		     hideAllDivs();
+            showLoader();			
+			setTimeout(() => { hideLoader(); document.getElementById("scatter2div").style.display = "block";  }, 1000);
+		}
+		else if(selectedValue == "pie1"){
+		    hideAllDivs();
+            showLoader();			
+			setTimeout(() => { hideLoader(); document.getElementById("pie1div").style.display = "block";  }, 1000);
+		}
+		
+		else if(selectedValue == "pie2"){
+		    hideAllDivs();
+            showLoader();			
+			setTimeout(() => { hideLoader(); document.getElementById("pie2div").style.display = "block";  }, 1000);
+			
+		}
+		
+		else if(selectedValue == "parell1"){
+		    hideAllDivs();
+            showLoader();			
+			setTimeout(() => { hideLoader(); document.getElementById("parell1div").style.display = "block";  }, 1000);
+			
+		}
+		
+		else if(selectedValue == "parell2"){
+		    hideAllDivs();
+            showLoader();			
+			setTimeout(() => { hideLoader(); document.getElementById("parell2div").style.display = "block";  }, 1000);
+			
+		}
+    }
+	
+	function hideAllDivs(){
+	    document.getElementById("scatter1div").style.display = "none";
+		document.getElementById("scatter2div").style.display = "none";
+		document.getElementById("pie1div").style.display = "none";
+		document.getElementById("pie2div").style.display = "none";
+		document.getElementById("parell1div").style.display = "none";
+		document.getElementById("parell2div").style.display = "none";
+		
+		document.getElementById("loaderdiv").style.display = "none";
+	}
+	
+	function showLoader(){
+	     hideAllDivs();
+		 document.getElementById("loaderdiv").style.display = "block";
+	}
+	function hideLoader(){
+	   document.getElementById("loaderdiv").style.display = "none";
+	}
+	
+	
+	</script> 	 
+	  <div>	  	
+        
+             <table id="headerTable" width="100%">
+			    <tr>
+				    <td><center><i class="fa fa-file"><b> Dataset Name : Cereals </b></center></td>
+					<td>
+					   <center> <select id="list" onChange="GetSelectedTextValue(this)">
+						  <option selected disabled>-- Select Visulisation --</option>
+						  <option value="scatter1">Zoomable Scatter plot</option>
+						  <option value="scatter2">Interactive Scatter plot</option>
+						  <option value="pie1">Interactive Protein Pie Chart</option>
+						  <option value="pie2">Interactive Calories Pie Chart</option>					  
+						  <option value="parell1">Interactive parallel Coordinates</option>
+						  <option value="parell2">Parallel Coordinates Chart</option>							  
+						</select>
+					   </center>
+					</td>
+					<td><center> <a href="data/a1-cereals.csv">Download Cereals Dataset <i class="fa fa-download"></i></a> </center></td>
+				</tr>
+              </table>   			 
+			
+	    		
+	  </div>
+	  
+	  <br>
+	  
+	  <div id="loaderdiv" style="padding:100px">
+	    <center><img src="https://i.ya-webdesign.com/images/loading-animated-png-6.gif" width="100px" height="100px"></center>
+	  </div>
+	  
+	  <div id="scatter1div"> 
+	       
+          <iframe src='cscat1.html' frameBorder="0" width=100% height=570px></iframe>
+		   
+	  </div>
+	  
+	  <div id="scatter2div">
+	  
+	      <iframe src='cscat2.html' frameBorder="0" width=100% height=570px></iframe>
+		 
+	  </div>
+	  
+	  <div id="pie1div">
+	  
+	      <iframe src='proteindonut.html' frameBorder="0" width=100% height=570px></iframe>
+		
+	  </div>
+	   <div id="pie2div">
+	  
+	      <iframe src='donut1.html' frameBorder="0" width=100% height=570px></iframe>
+		
+	  </div>
+	 <div id="parell1div">
+	  
+	      <iframe src='parellC.html' frameBorder="0" width=100% height=570px></iframe>
+		
+	  </div>
+	  
+	  <div id="parell2div">
+	  
+	      <iframe src='cereals2.html' frameBorder="0" width=100% height=570px></iframe>
+		
+	  </div>
+	  
+	  
+</body>
+</html>

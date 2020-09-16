@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+<script type="text/javascript" src="https://d3js.org/d3.v4.min.js"></script>
+   <style>
+      .arc text {
+         font: 14px;
+         text-anchor: middle;
+      }
+   </style>
+
+   
+</head>
+
+<body>
+   <svg width="1200" height="650"></svg>
+   <div align=left style="margin-left:80px; margin-right:80px"><p>
+ Here the above pie chart is built on films dataset by considering the average popularity of the film based on the subject where it is nothing but a genre. We can say that which genre are mostly polpular by looking in to the chart. 
+</p></div>
+  
+   
+   <script>
+   d3.csv("data/a1-film.csv", function (error, data) {
+         if (error) {
+            throw error;
+         }
+         var avgPopularity = d3.nest()
+            .key(function (d) { return d.Subject; })
+            .rollup(function (v) { return Math.round(d3.mean(v, function (d) { return d.Popularity; }) * 100) / 100; })
+            .entries(data);
+
+         drawPieChart(avgPopularity);
+      });
+	  function drawPieChart(data) {
+
+         var arc = addG.selectAll(".arc")
+            .data(pieChart(data))
+            .enter()
+            .append("g")
+            .attr("class", "arc");
+
+         arc.append("path")
+            .attr("d", path)
+            .attr("fill", function (d) { return pieColor(d.data.key); })
+
+
+
+
+         arc.append("text").attr("transform", function (d) {
+            return "translate(" + pieLabel.centroid(d) + ")";
+         }).text(function (d) { return "" + d.data.key + " : " + d.data.value; });
+      };
+
+	  
+	  
+      var svg = d3.select("svg"),
+         width = svg.attr("width"),
+         height = svg.attr("height"),
+         radius = Math.min(width - 400, height - 325);
+
+      var addG = svg.append("g")
+         .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+      
+
+      var pieChart = d3.pie().value(function (d) {
+         return d.value;
+      });
+
+      var path = d3.arc()
+         .outerRadius(radius - 40).innerRadius(0);
+
+      var pieLabel = d3.arc()
+         .outerRadius(radius).innerRadius(150);
+
+      
+      
+      svg.append("g")
+         .attr("transform", "translate(" + (width / 2 - 100) + "," + 20 + ")")
+         .append("text").attr("font-size", "24px").text("Average Popurality based on Film Subject")
+         .attr("class", "title")
+		var pieColor = d3.scaleOrdinal([
+         '#800000', '#666633', '#e6e600', '#b30077', '#00b38f', 'orange', '#ac3939','blue','violet'
+      ]);
+
+   </script>
+</body>
+
+</html>

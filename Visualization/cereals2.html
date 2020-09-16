@@ -1,0 +1,129 @@
+
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<head>
+
+<!-- Create a div where the graph will take place -->
+<div id="d3"></div>
+
+<!-- A bit of style -->
+<style>
+.axis {
+  opacity: 1;
+}
+.axis:hover {
+  opacity: 4;
+}
+</style>
+
+
+
+<script>
+//dimensions
+var margin = {top: 50, right: 80, bottom: 30, left: 80},
+  width = 1000 - margin.left - margin.right,
+  height = 600 - margin.top - margin.bottom;
+
+var svg = d3.select("#d3")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+// Parse the Data
+d3.csv("data/a1-cereals1.csv", function(data) {
+  var color = d3.scaleOrdinal()
+    .domain(["A", "G", "K", "N", "P", "Q", "R" ])
+    .range([ "#ff3333", "#ffa64d", "#ff9933", "#ff4d88","#d2a679","#33ff99","#0088cc"])
+
+  // Here I set the list of dimension manually to control the order of axis:
+  dimensions =  d3.keys(data[0]).filter(function(d) { return ( (d == "Calories") || (d == "Protein") || (d == "Fat") || (d=="Carbohydrates")||(d=="Sugars") ) })
+
+  // For each dimension, I build a linear scale. I store all in a y object
+  var y = {}
+  for (i in dimensions) {
+    name = dimensions[i]
+    y[name] = d3.scaleLinear()
+      .domain( d3.extent(data, function(d) { return +d[name]; }) )
+      .range([height, 0])
+  }
+
+  x = d3.scalePoint()
+    .range([0, width])
+    .domain(dimensions);
+
+  var onHover = function(d){
+
+    selected = d.Manufacturer
+
+    // first every group turns grey
+    d3.selectAll(".line")
+      .transition().duration(200)
+      .style("stroke", "lightgrey")
+      .style("opacity", "0")
+    // Second the hovered method takes its color
+    d3.selectAll("." + selected)
+      .transition().duration(100)
+      .style("stroke", color(selected))
+      .style("opacity", "1")
+  }
+
+  var doNotonHover = function(d){
+    d3.selectAll(".line")
+      .transition().duration(200).delay(100)
+      .style("stroke", function(d){ return( color(d.Manufacturer))} )
+      .style("opacity", "0.5")
+  }
+
+  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+  function path(d) {
+      return d3.line()(dimensions.map(function(p) { return [x(p), y[p](d[p])]; }));
+  }
+
+  // Draw the lines
+  svg
+    .selectAll("myPath")
+    .data(data)
+    .enter()
+    .append("path")
+      .attr("class", function (d) { return "line " + d.Manufacturer } ) // 2 class for each line: 'line' and the group name
+      .attr("d",  path)
+      .style("fill", "none" )
+      .style("stroke", function(d){ return( color(d.Manufacturer))} )
+      .style("opacity", 0.5)
+      .on("mouseover", onHover)
+      .on("mouseleave", doNotonHover )
+
+  svg.selectAll("myAxis")
+    .data(dimensions).enter()
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
+    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(10).scale(y[d])); })
+    .append("text")
+      .style("text-anchor", "middle")
+      .attr("y", -9)
+      .text(function(d) { return d; })
+      .style("fill", "black")
+
+})
+
+	svg.append("text")
+    
+	.attr('x', 350)
+	.attr('y', -35)
+	.attr("font-size", "20px")
+	.text("Cerals Parallel coordinates chart")
+</script>
+
+ <div align=left style="margin-left:80px; margin-right:80px"><p>
+The above is the Parallel coordinates chart on the Cerals dataset with calorie, protein, fat, carbohydrates, Sugar and if you hover it will show this for the different Manufacturer of the given data which is distinguish by different colors
+</p></div>
+</head>

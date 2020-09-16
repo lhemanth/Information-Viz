@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+ <script src="https://d3js.org/d3.v4.min.js"></script>
+    <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<script src="https://d3js.org/d3.v4.js"></script>
+
+
+<script src="https://cdn.jsdelivr.net/gh/holtzy/D3-graph-gallery@master/LIB/d3-scale-radial.js"></script>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 100, right: 0, bottom: 0, left: 0},
+    width = 660 - margin.left - margin.right,
+    height = 460 - margin.top - margin.bottom,
+    innerRadius = 100,
+    outerRadius = Math.min(width-300, height-200);   // the outerRadius goes from the middle of the SVG area to the border
+
+// append the svg object
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + (width / 2 + margin.left) + "," + (height / 2 + margin.top) + ")");
+
+d3.csv("data/film.csv", function(data) {
+
+  // Scales
+  var x = d3.scaleBand()
+      .range([0, 2 * Math.PI])    // X axis goes from 0 to 2pi = all around the circle. If I stop at 1Pi, it will be around a half circle
+      .align(0)                  
+      .domain(data.map(function(d) { return d.Subject; })); // The domain of the X axis is the list of states.
+  var y = d3.scaleRadial()
+      .range([innerRadius, outerRadius])   
+      .domain([0, 18000]); 
+
+  // Add the bars
+  svg.append("g")
+    .selectAll("path")
+    .data(data)
+    .enter()
+    .append("path")
+	.transition().duration(2000).delay(200)
+      .attr("fill", "#ff6666")
+      .attr("d", d3.arc()     // imagine your doing a part of a donut plot
+          .innerRadius(innerRadius)
+          .outerRadius(function(d) { return y(d['Popularity']); })
+          .startAngle(function(d) { return x(d.Subject); })
+          .endAngle(function(d) { return x(d.Subject) + x.bandwidth(); })
+          .padAngle(0.02)
+          .padRadius(innerRadius))
+	svg.append("text")
+    
+	.attr('x', -70)
+	.attr('y', -200)
+	.attr("font-size", "20px")
+	.text("Average Popularity By Subject")	  
+		  
+		  
+		  
+
+
+  // Add the labels
+  svg.append("g")
+      .selectAll("g")
+      .data(data)
+      .enter()
+      .append("g")
+        .attr("text-anchor", function(d) { return (x(d.Subject) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "end" : "start"; })
+        .attr("transform", function(d) { return "rotate(" + ((x(d.Subject) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")"+"translate(" + (y(d['Popularity'])+10) + ",0)"; })
+      .append("text")
+        .text(function(d){return(d.Subject)})
+        .attr("transform", function(d) { return (x(d.Subject) + x.bandwidth() / 2 + Math.PI) % (2 * Math.PI) < Math.PI ? "rotate(180)" : "rotate(0)"; })
+        .style("font-size", "11px")
+        .attr("alignment-baseline", "middle")
+
+});
+
+</script>
+<body>
+ <div align=left style="margin-left:80px; margin-right:80px"><p>
+Here in the Above visualization shows the average Popularity of films dataset based on the subject. By seeing the circular bar plot we can identify which genre are more popular. The same has been done by using the pie chart as well click the below button to check it.
+</p></div>
+<div class="container">
+   	<a href="film2.html" class="btn btn-info" role="button">Pie</a>    
+	
+
+  </div>
+</body>
+
+</html>

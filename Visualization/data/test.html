@@ -1,0 +1,97 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Car dataset visualization</title>
+
+    <!--CSS-->
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.1/css/all.css" integrity="sha384-gfdkjb5BdAXd+lj+gudLWI+BXq4IuLW5IT+brZEZsLFm++aCMlF1V92rMkPaX4PP" crossorigin="anonymous">
+    <!--Bootstrap CDN-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" type="text/css" />
+    <!--Font Awesome-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css" />
+    <!--CSS file for loading the graphs-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/3.0.9/dc.min.css" type="text/css" />
+    <!--Google Fonts-->
+    <link href="https://fonts.googleapis.com/css?family=Oswald" rel="stylesheet">
+    <!--Custom CSS-->
+    <link rel="stylesheet" href="static/css/style.css" type="text/css" />
+</head>
+
+<body>
+    <header class="header">
+        <nav class="navbar fixed-top navbar-dark">
+            <a class="navbar-brand" href="#"><img src="static/images/car.png" width="75" height="75" alt="navBar brand"/>
+                <h1>Car dataset visualization</h1></a>
+
+        </nav>
+    </header>
+    <main>
+        <section class="section borderBottom" id="home">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-8 offset-sm-2 offset-md-3 col-md-6 offset-lg-4 col-lg-4" id="cerealSelector">
+                        <h3>Select your desired car:</h3>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 offset-md-1 col-md-10 offset-lg-3 col-lg-6 pieChart chart" id="productsPerManufacturer">
+                        <h2>Car Manufacturers</h2>
+                        <p>From the pie chart we can clearly see that ford manufactures the largest variety of cars with count "53"</p>
+                    </div>
+                    <!-- <div class="row">
+                      <div class="col-sm-12 offset-md-1 col-md-10 offset-lg-3 col-lg-6 chart" id="calorieContent">
+                        <h2>Average acceleration for each manufacturer</h2>
+                        <p>From the bar chart we can clearly state that both mercedes and peugeot have highest average acceleration with value "19"</p>
+                      </div>
+                    </div> -->
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="bar">
+          <div class="container">
+              <div class="row">
+                <div class="col-sm-12 offset-md-1 col-md-10 offset-lg-3 col-lg-6 chart" id="calorieContent">
+                  <h2>Average acceleration for each manufacturer</h2>
+                  <p>From the bar chart we can clearly state that both mercedes and peugeot have highest average acceleration with value "19"</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!--end of nutrition breakdown section-->
+        <!--scatter plot showing serving size/calorie correlation and reset button for all charts-->
+        <section class="section" id="serving">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12 offset-md-1 col-md-10 offset-lg-3 col-lg-6 chart" id="servingSizeCalorieCorrelation">
+                        <h2 class="scatterPlotHeader" id="servingSize">MPG for each car</h2>
+                        <p>As can be seen below, there is very little correlation between mpg and car </p>
+                    </div>
+                </div>
+                </div>
+        </section>
+      </main>
+
+    <!--JavaScript Files-->
+    <!--jQuery-->
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!--Bootstrap JS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/js/bootstrap.min.js"></script>
+    <!--JS libraries for charts-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.min.js"></script>
+    <!--Custom JS file for charts-->
+    <script src="charts.js"></script>
+    <script src="nav.js"></script>
+</body>
+
+</html>

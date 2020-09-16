@@ -1,0 +1,160 @@
+    <html >
+    <head >
+    <script type = "text/javascript" src = "https://d3js.org/d3.v4.min.js" > </script> </head> 
+    <body >
+	<h1>Rating By Average 3 MO</h1>
+	<div id = "container" ></div>
+
+        <script >
+        d3.csv("data/a1-mutualfunds.csv", function(error, data) {
+            if (error) {
+                throw error;
+            }
+            console.log(data)
+            var avgOneYear = d3.nest()
+                .key(function(d) { if(d.rating != "")
+                    {return d.rating}
+                })
+                .rollup(function(v) {
+                    return Math.round(d3.mean(v, function(d) {
+                        return d["3MO"];
+                    }) *100)/100;
+                })
+                .entries(data);
+
+
+            drawBarChart(avgOneYear);
+        });
+
+    function drawBarChart(data) {
+        var groupdata =[];
+        var ratingKeys= d3.keys(data);
+        ratingKeys.forEach(function(element)
+    {
+    var dataLine = {};
+
+    dataLine["key"] = +element;
+    dataLine["Value"] = data[element].value;
+    groupdata.push(dataLine);
+    });
+        
+        // Margins 
+        var margin = {
+                top: 20,
+                right: 20,
+                bottom: 40,
+                left: 250
+            },
+            width = 1200 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // scales
+        var xScale = d3.scaleLinear()
+            .range([0, width]);
+
+        var yScale = d3.scaleBand()
+            .rangeRound([0, height])
+            .paddingInner(0.2);
+
+        var div = d3.select("#container").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+
+        // domains
+        xScale.domain([0, 30]);
+
+        yScale.domain(data.map(function(d) {
+		//if(d.key=="undifined"){d.key=0;}
+		console.log(d.key);
+            return d.key;
+        }));
+
+        var xAxis = d3.axisBottom()
+            .scale(xScale)
+
+
+        // create svg
+        var svg = d3.select("#container")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+        
+var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("background", "white")
+	.style("font-size", "25px")
+
+
+
+       	
+		 
+        
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+
+        
+            svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -100)
+        .attr("x",-250)
+        .attr("dy", "1em")
+        .attr("font-size", "24px")
+        .style("text-anchor", "middle")
+        .text("Rating");
+
+        svg.append("text")
+	.attr('x', 300)
+	.attr('y', 475 )
+	.attr("font-size", "20px")
+	.text("Avg 3MO")
+
+
+
+        // add tickNegative
+        var Neg = svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(" + xScale(0) + ",0)")
+            .call(d3.axisLeft(yScale))
+            .filter(function(d, i) {
+                return data[i].value < 0;
+            });
+
+         svg.selectAll(".bar")
+            .data(data)
+            .enter()
+            .append("rect")
+			.style("fill","#229954")
+			.transition().duration(1000).delay(100)
+            .attr("x", function(d) {
+                return xScale(Math.min(0, d.value));
+            })
+            .attr("y", function(d) {
+                return yScale(d.key);
+            })
+            .attr("width", function(d) {
+                return Math.abs(xScale(d.value) - xScale(0));
+            })
+            .attr("height", 50)
+            .on("mouseover", function(d){tooltip.text(d.value); return tooltip.style("visibility", "visible");})
+      .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+      .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+            
+            }
+            </script>
+			 <div align=left style="margin-left:80px; margin-right:80px"><p>
+The above visualization is the Horizontal bar chart for the mutual funds dataset. The bar chart is between the average of three months and the rating related to the funds data. You can hover on it to view the approximate average of the data.
+</p></div>
+        </body> 
+    </html>

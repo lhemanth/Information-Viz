@@ -1,0 +1,317 @@
+
+<!-- Code from d3-graph-gallery.com -->
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<head>
+
+<!-- Create a div where the graph will take place -->
+
+
+<!-- A bit of style -->
+<style>
+.axis {
+  opacity: 1;
+}
+.axis:hover {
+  opacity: 4;
+}
+</style>
+
+</head>
+
+<body>
+
+<div id="d3" style="border:1px solid black"></div>
+ <div align=left style="margin-left:80px; margin-right:80px; border:1px solid black" ><p>
+The above is the Parallel coordinates chart on the Cerals dataset with calorie, protein, fat, carbohydrates, Sugar and if you hover it will show this for the different Manufacturer of the given data which is distinguish by different colors
+</p></div>
+<div id = "container" style="border:1px solid black" ></div>
+<div style="border:1px solid black">Project 3 viz</div>
+<script>
+//dimensions
+var margin = {top: 50, right: 80, bottom: 30, left: 80},
+  width = 1000 - margin.left - margin.right,
+  height = 600 - margin.top - margin.bottom;
+
+var svg = d3.select("#d3")
+.append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+.append("g")
+  .attr("transform",
+        "translate(" + margin.left + "," + margin.top + ")");
+
+// Parse the Data
+d3.csv("data/a1-cereals1.csv", function(data) {
+  var color = d3.scaleOrdinal()
+    .domain(["A", "G", "K", "N", "P", "Q", "R" ])
+    .range([ "#ff3333", "#ffa64d", "#ff9933", "#ff4d88","#d2a679","#33ff99","#0088cc"])
+
+  // Here I set the list of dimension manually to control the order of axis:
+  dimensions =  d3.keys(data[0]).filter(function(d) { return ( (d == "Calories") || (d == "Protein") || (d == "Fat") || (d=="Carbohydrates")||(d=="Sugars") ) })
+
+  // For each dimension, I build a linear scale. I store all in a y object
+  var y = {}
+  for (i in dimensions) {
+    name = dimensions[i]
+    y[name] = d3.scaleLinear()
+      .domain( d3.extent(data, function(d) { return +d[name]; }) )
+      .range([height, 0])
+  }
+
+  x = d3.scalePoint()
+    .range([0, width])
+    .domain(dimensions);
+
+  var onHover = function(d){
+
+    selected = d.Manufacturer
+
+    // first every group turns grey
+    d3.selectAll(".line")
+      .transition().duration(200)
+      .style("stroke", "lightgrey")
+      .style("opacity", "0")
+    // Second the hovered method takes its color
+    d3.selectAll("." + selected)
+      .transition().duration(100)
+      .style("stroke", color(selected))
+      .style("opacity", "1")
+  }
+
+  var doNotonHover = function(d){
+    d3.selectAll(".line")
+      .transition().duration(200).delay(100)
+      .style("stroke", function(d){ return( color(d.Manufacturer))} )
+      .style("opacity", "0.5")
+  }
+
+  // The path function take a row of the csv as input, and return x and y coordinates of the line to draw for this raw.
+  function path(d) {
+      return d3.line()(dimensions.map(function(p) { return [x(p), y[p](d[p])]; }));
+  }
+
+  // Draw the lines
+  svg
+    .selectAll("myPath")
+    .data(data)
+    .enter()
+    .append("path")
+      .attr("class", function (d) { return "line " + d.Manufacturer } ) // 2 class for each line: 'line' and the group name
+      .attr("d",  path)
+      .style("fill", "none" )
+      .style("stroke", function(d){ return( color(d.Manufacturer))} )
+      .style("opacity", 0.5)
+      .on("mouseover", onHover)
+      .on("mouseleave", doNotonHover )
+
+  svg.selectAll("myAxis")
+    .data(dimensions).enter()
+    .append("g")
+    .attr("class", "axis")
+    .attr("transform", function(d) { return "translate(" + x(d) + ")"; })
+    .each(function(d) { d3.select(this).call(d3.axisLeft().ticks(10).scale(y[d])); })
+    .append("text")
+      .style("text-anchor", "middle")
+      .attr("y", -9)
+      .text(function(d) { return d; })
+      .style("fill", "black")
+
+})
+
+	svg.append("text")
+    
+	.attr('x', 350)
+	.attr('y', -35)
+	.attr("font-size", "20px")
+	.text("Cerals Parallel coordinates chart")
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+        d3.csv("data/a1-mutualfunds.csv", function(error, data) {
+            if (error) {
+                throw error;
+            }
+            console.log(data)
+            var avgOneYear = d3.nest()
+                .key(function(d) { if(d.rating != "")
+                    {return d.rating}
+                })
+                .rollup(function(v) {
+                    return Math.round(d3.mean(v, function(d) {
+                        return d["3MO"];
+                    }) *100)/100;
+                })
+                .entries(data);
+
+
+            drawBarChart(avgOneYear);
+        });
+
+    function drawBarChart(data) {
+        var groupdata =[];
+        var ratingKeys= d3.keys(data);
+        ratingKeys.forEach(function(element)
+    {
+    var dataLine = {};
+
+    dataLine["key"] = +element;
+    dataLine["Value"] = data[element].value;
+    groupdata.push(dataLine);
+    });
+        
+        // Margins 
+        var margin = {
+                top: 20,
+                right: 20,
+                bottom: 40,
+                left: 250
+            },
+            width = 1200 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // scales
+        var xScale = d3.scaleLinear()
+            .range([0, width]);
+
+        var yScale = d3.scaleBand()
+            .rangeRound([0, height])
+            .paddingInner(0.2);
+
+        var div = d3.select("#container").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);
+
+
+        // domains
+        xScale.domain([0, 30]);
+
+        yScale.domain(data.map(function(d) {
+		//if(d.key=="undifined"){d.key=0;}
+		console.log(d.key);
+            return d.key;
+        }));
+
+        var xAxis = d3.axisBottom()
+            .scale(xScale)
+
+
+        // create svg
+        var svg = d3.select("#container")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+        
+var tooltip = d3.select("body")
+    .append("div")
+    .style("position", "absolute")
+    .style("z-index", "10")
+    .style("visibility", "hidden")
+    .style("background", "white")
+	.style("font-size", "25px")
+
+
+
+       	
+		 
+        
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+
+        
+            svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -100)
+        .attr("x",-250)
+        .attr("dy", "1em")
+        .attr("font-size", "24px")
+        .style("text-anchor", "middle")
+        .text("Rating");
+
+        svg.append("text")
+	.attr('x', 300)
+	.attr('y', 475 )
+	.attr("font-size", "20px")
+	.text("Avg 3MO")
+
+
+
+        // add tickNegative
+        var Neg = svg.append("g")
+            .attr("class", "y axis")
+            .attr("transform", "translate(" + xScale(0) + ",0)")
+            .call(d3.axisLeft(yScale))
+            .filter(function(d, i) {
+                return data[i].value < 0;
+            });
+
+         svg.selectAll(".bar")
+            .data(data)
+            .enter()
+            .append("rect")
+			.style("fill","#229954")
+			.transition().duration(1000).delay(100)
+            .attr("x", function(d) {
+                return xScale(Math.min(0, d.value));
+            })
+            .attr("y", function(d) {
+                return yScale(d.key);
+            })
+            .attr("width", function(d) {
+                return Math.abs(xScale(d.value) - xScale(0));
+            })
+            .attr("height", 50)
+            .on("mouseover", function(d){tooltip.text(d.value); return tooltip.style("visibility", "visible");})
+      .on("mousemove", function(){return tooltip.style("top", (d3.event.pageY-10)+"px").style("left",(d3.event.pageX+10)+"px");})
+      .on("mouseout", function(){return tooltip.style("visibility", "hidden");});
+            
+            }
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+</script>
+
+
+</body>
